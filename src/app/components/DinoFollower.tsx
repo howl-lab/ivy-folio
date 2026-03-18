@@ -20,19 +20,40 @@ function DinoSprite({
         display: "block",
       }}
     >
-      <rect x="3" y="2" width="6" height="4" fill="#0015FF" />
-      <rect x="7" y="0" width="3" height="3" fill="#0015FF" />
+      {/* tail */}
+      <rect x="0" y="5" width="1" height="1" fill="#0015FF" />
+      <rect x="1" y="4" width="1" height="1" fill="#0015FF" />
+      {/* body */}
+      <rect x="2" y="3" width="7" height="3" fill="#0015FF" />
+      {/* upper body slope */}
+      <rect x="4" y="2" width="4" height="1" fill="#0015FF" />
+      {/* neck */}
+      <rect x="7" y="1" width="2" height="2" fill="#0015FF" />
+      {/* head */}
+      <rect x="8" y="0" width="1" height="2" fill="#0015FF" />
+      {/* snout */}
       <rect x="9" y="1" width="2" height="1" fill="#0015FF" />
-      <rect x="8" y="0" width="1" height="1" fill="#0015FF" />
-      <rect x="2" y="3" width="1" height="1" fill="#000" />
-      <rect x="1" y="4" width="1" height="1" fill="#000" />
+
+      {/* legs */}
       <rect
-        x="4" y="6" width="1" height="1" fill="#000"
-        style={walking ? { animation: "legA 0.28s steps(1) infinite" } : undefined}
+        x="4"
+        y="6"
+        width="1"
+        height="1"
+        fill="#0015FF"
+        style={
+          walking ? { animation: "legA 0.28s steps(1) infinite" } : undefined
+        }
       />
       <rect
-        x="6" y="6" width="1" height="1" fill="#000"
-        style={walking ? { animation: "legB 0.28s steps(1) infinite" } : undefined}
+        x="6"
+        y="6"
+        width="1"
+        height="1"
+        fill="#0015FF"
+        style={
+          walking ? { animation: "legB 0.28s steps(1) infinite" } : undefined
+        }
       />
     </svg>
   );
@@ -46,7 +67,9 @@ export default function DinoFollower({ active = true }: { active?: boolean }) {
   const target = useRef({ x: -200, y: -200 });
   const current = useRef({ x: -200, y: -200 });
   const lastMouseX = useRef(-200);
-  const walkTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const walkTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const raf = useRef<number | undefined>(undefined);
 
   useEffect(() => {

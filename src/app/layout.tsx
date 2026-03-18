@@ -4,7 +4,7 @@ import CustomCursor from "./components/CustomCursor";
 
 export const metadata: Metadata = {
   title: "ivy chang",
-  description: "design",
+  description: "design portfolio",
 };
 
 export default function RootLayout({

@@ -14,6 +14,10 @@ export interface ExpandedImage {
   caption: string;
 }
 
+// Summary supports mixed plain text and inline links:
+// summary: ["Some text ", { text: "link label", url: "https://..." }, " more text"]
+export type SummarySegment = string | { text: string; url: string };
+
 export interface Contribution {
   title: string;
   description: string;
@@ -35,7 +39,7 @@ export interface Sidebar {
 export interface Project {
   id: string;
   label: string;
-  summary: string;
+  summary: SummarySegment[];
   sidebar: Sidebar;
   contributions: Contribution[];
 }
@@ -44,8 +48,9 @@ export const PROJECTS: Project[] = [
   {
     id: "presence-ai",
     label: "Presence AI",
-    summary:
-      "Led everything design for the consumer-facing realtime avatar.\n \n Company goal: 500K-1M MAU, 20% of user in session for 5min and 10% for 10min",
+    summary: [
+      "Led everything design for the consumer-facing realtime avatar.\n \n Company goal: 500K-1M MAU + 20% of user in session for 5min and 10% for 10min",
+    ],
     sidebar: {
       problem:
         "How do we elevate human and AI conversation? What other formats or cadence of conversation can we have with AI?",
@@ -119,12 +124,12 @@ export const PROJECTS: Project[] = [
           {
             src: "/images/presence/convo-ui1.mp4",
             caption:
-              "Tech limitation: Avatar's audio status is hard to assess \n Design solution: Voice indicator to give visue cues and for team to debug more easily",
+              "Tech limitation: Avatar's audio status is hard to assess \n → Design solution: Voice indicator to give visue cues and for team to debug more easily",
           },
           {
             src: "/images/presence/convo-ui2.mp4",
             caption:
-              "Tech limitation: Lipsync is not perfect and video mode cost a lot  \n // Design solution: Emphasize text and audio mode",
+              "Tech limitation: Lipsync is not perfect and video mode cost a lot  \n → Design solution: Emphasize text and audio mode",
           },
         ],
       },
@@ -133,8 +138,13 @@ export const PROJECTS: Project[] = [
   {
     id: "headroom",
     label: "Headroom",
-    summary:
-      "Acquired by Upwork in 2024. \n As the sole and lead designer on the team, I facilitated collaboration between Heads of Product, Engineering, and Marketing on a platform that makes it easy to leverage multimodal AI to create collaborative experiences",
+    summary: [
+      {
+        text: "Acquired",
+        url: "https://investors.upwork.com/news-releases/news-release-details/upwork-reports-fourth-quarter-and-full-year-2023-financial",
+      },
+      " by Upwork in November 2023. \n \n As the sole and lead designer on the team, I facilitated collaboration between Heads of Product, Engineering, and Marketing on a platform that makes it easy to leverage multimodal AI to create collaborative experiences",
+    ],
 
     sidebar: {
       problem: "How do we help people collaborate more easily?",
@@ -142,7 +152,7 @@ export const PROJECTS: Project[] = [
       proposal:
         "AI-powered collaboration with capabilities like summaries, replay, highlight, auto transcripts, action items and search",
       outcome:
-        "Collaboration with Lucidspark laucned July 2023. Developer platform pivotted in 3 months. Acquired by Upwork November 2023",
+        "Collaboration with Lucidspark lauched July 2023. Developer platform pivotted in 3 months, acquired by Upwork November 29 2023",
     },
     contributions: [
       {
@@ -151,11 +161,18 @@ export const PROJECTS: Project[] = [
           "Designed a SDK tool to showcase Headroom's AI capabilities and streamline to teams though an API",
         hoverImage: "/images/headroom/sdk-tool.jpg",
         expandedText:
-          "Even though the product is a developer tool, I designed the interface to be friendly for both technical and non-technical audiences: \n Onboarding, dashboard (overview), pricing calculator, documentation (Git), playground (using room ID)",
+          "Even though the product is a developer tool, I designed the interface to be friendly for both technical and non-technical audiences",
         expandedImages: [
-          { src: "/images/headroom/sdk1.mp4", caption: "— caption —" },
-          { src: "/images/headroom/sdk2.mp4", caption: "— caption —" },
-          { src: "/images/headroom/sdk3.mp4", caption: "— caption —" },
+          { src: "/images/headroom/sdk1.mp4", caption: "Dashboard overview" },
+          {
+            src: "/images/headroom/sdk2.mp4",
+            caption: "Playground (sessions based on room ID",
+          },
+          {
+            src: "/images/headroom/sdk3.mp4",
+            caption:
+              "Pricing calculator to gauge billing based on credit usages",
+          },
         ],
       },
       {
@@ -182,7 +199,7 @@ export const PROJECTS: Project[] = [
         title: "The Headroom brand",
         description:
           "Established the brand through design system, marketing materials, and product interface",
-        hoverImage: "/images/headroom.jpg",
+        hoverImage: "/images/headroom/headroom.jpg",
         expandedText:
           "Responsible for integrated brand identity into Webflow for seamless marketing alignment and throughout different touchpoints in the product and company operation",
         expandedImages: [
@@ -193,7 +210,8 @@ export const PROJECTS: Project[] = [
           },
           {
             src: "/images/headroom/headroom2.jpg",
-            caption: "Designed for SEO discovery and outreach to B2B partners",
+            caption:
+              "Designed website for SEO discovery and outreach to B2B partners",
           },
         ],
       },
@@ -202,8 +220,14 @@ export const PROJECTS: Project[] = [
   {
     id: "grand-theft-auto",
     label: "Grand Theft Auto",
-    summary:
-      "Defined interactions for the web-based application that lets player create license plates out-of-console \n \n Part of the innovation Marketing team on a design team of 2. Defined the majority of the interface and interaction of the application, and built off GTA's main design system",
+    summary: [
+      "Defined interactions for the web-based application, ",
+      {
+        text: "License Plate Creator",
+        url: "https://www.rockstargames.com/gta-online/license-plates",
+      },
+      ", that lets player personalize in-game plates out-of-console \n \n Part of the innovation Marketing team on a design team of 3. Defined the majority of application interface and interaction; built off GTA's main design system",
+    ],
     sidebar: {
       problem:
         "The 2013 companion app, iFruit, which lets user enjoy in-game contents out of console, has 2.2 stars rating/400K reviews and buggy. How can we make it better?",
@@ -218,7 +242,7 @@ export const PROJECTS: Project[] = [
         title: "Story-driven UX",
         description:
           "Crafted a narrative flow that supported over 15 million player from console to web",
-        hoverImage: "/images/gta.mp4",
+        hoverImage: "/images/gta/gta.mp4",
         expandedText:
           "Storytelling is a major aspect of GTA brand identity and component of user retention. \n Technical constraints: hosting large 3D assets can make Canvas rendering laggy which interrupts the storytelling flow \n Design solution: I found a solution through a two column system in which the canvas and panel slides (to tell the story) throughout the creation process and only have to render once in the beginning",
         expandedImages: [
@@ -238,7 +262,7 @@ export const PROJECTS: Project[] = [
         title: "User-centric states",
         description:
           "Mapped out states and design for a seamless player experience.",
-        hoverImage: "/images/gta-states.jpg",
+        hoverImage: "/images/gta/gta-states.jpg",
         expandedText:
           "I designed with the mindset of addressing each user states with care. A huge push was to give guest players the ability to demo the application first before prompting account creation (buld trust)",
         expandedImages: [
@@ -263,7 +287,7 @@ export const PROJECTS: Project[] = [
         title: "Copywriting as education",
         description:
           "Championed for clarity and transparency in the overall experience through UI copy",
-        hoverImage: "/images/gta-copy.mp4",
+        hoverImage: "/images/gta/gta-copy.mp4",
         expandedText:
           "Infering directions and dependencies through copies \n While working on this project, I recognized the subtle distinction that UI and UX can guide, but copies can tell it straight \n I did all my mocks with realistic writing and insert as much instructional and contextual tones whenever possible \n We were working with limited API metadata, I want to be help players understand (remove tension) the invisible dependencies between web and console",
         expandedImages: [
@@ -279,8 +303,14 @@ export const PROJECTS: Project[] = [
   {
     id: "museum-of-arts-and-design",
     label: "Museum of Arts & Design",
-    summary:
-      "Crafted a digital exhibition for the Burke Prize 2021 biannual show. Co-created an online artist exhibition, focused on accessibility and showcased artists' work in narrative form",
+    summary: [
+      "As the studio's first product designer, I co-created directly with the Director of Emerging Technology to craft a ",
+      {
+        text: "digital exhibition",
+        url: "https://madmuseum.org/burke-prize-2021/",
+      },
+      " for the Burke Prize 2021 biannual contemporary art prize, focused on accessibility and showcased artists' work in narrative form",
+    ],
     sidebar: {
       problem:
         "The exhibition normally takes place onsite at New York, but due to Covid, had to be remote",
@@ -308,7 +338,11 @@ export const PROJECTS: Project[] = [
             caption:
               "I composed a system for how we can organize and structure all the artifacts",
           },
-          { src: "/images/mad/mad3.jpg", caption: "— caption —" },
+          {
+            src: "/images/mad/mad3.jpg",
+            caption:
+              "Based on the system, I came up with media categories and designed unique components",
+          },
         ],
       },
       {
@@ -335,7 +369,7 @@ export const PROJECTS: Project[] = [
         title: "Website design",
         description:
           "Defined a narrative-first and hands-on interaction system and visual language",
-        hoverImage: "/images/mad-web.mp4",
+        hoverImage: "/images/mad/mad-web.jpg",
         expandedText:
           "I worked directly with the Engineer and Design Director on implementation of the site with focus on accessibility, assets hosting, links, and components",
         expandedImages: [
@@ -356,8 +390,19 @@ export const PROJECTS: Project[] = [
   {
     id: "socratic",
     label: "Socratic",
-    summary:
-      "Rebranding the AI-powered app, Socratic, to help students with their homework by providing educational resources like videos, definitions, Q&A, links and more",
+    summary: [
+      "Rebranding the AI-powered app, Socratic, to help students with their homework by providing educational resources like videos, definitions, Q&A, links and more \n \n 2019 launch covered by ",
+      {
+        text: "Google's blog",
+        url: "https://blog.google/products-and-platforms/products/education/socratic-by-google/#:~:text=To%20help%20students%20working%20on,them%20work%20through%20their%20questions.",
+      },
+      " and ",
+      {
+        text: "TIME",
+        url: "https://time.com/4650119/socratic-app-homework-iphone/",
+      },
+      "",
+    ],
     sidebar: {
       problem:
         "Regular Google search can be daunting for younger learners and Google just acquired an AI educational app called Socratic",
@@ -374,11 +419,23 @@ export const PROJECTS: Project[] = [
           "I defined the new visual system and guidelines for the rebrand",
         hoverImage: "/images/socratic/socratic.jpg",
         expandedText:
-          "Rebrand the app to feel Googley and fun; make the new app feel like part of Google's product ecosystem \n Ensured the system is scaleable, Developed delightful tone and colorful for Gen Z and Alpha audiences, Harmonized with the rest of Google's products, Paired graphic and text concepts across learning content, Created a custom font within 2 weeks to be used for content creation",
+          "Rebrand the app to feel Googley and fun; make the new app feel like part of Google's product ecosystem \n Ensured the system is scaleable, Paired graphic and text concepts across learning content",
         expandedImages: [
-          { src: "/images/socratic/socratic1.jpg", caption: "— caption —" },
-          { src: "/images/socratic/socratic2.mp4", caption: "— caption —" },
-          { src: "/images/socratic/socratic3.jpg", caption: "— caption —" },
+          {
+            src: "/images/socratic/socratic1.jpg",
+            caption:
+              "I came up with a graphic style based on fidelity and delightful for Gen Z and Alpha audiences",
+          },
+          {
+            src: "/images/socratic/socratic2.mp4",
+            caption:
+              "I created a brand new custom font within 2 weeks to be used for content creation so the team have full control of characters and symbols to build with",
+          },
+          {
+            src: "/images/socratic/socratic3.jpg",
+            caption:
+              "Created a complimentary theme for Socratic from Google Material's color guideline",
+          },
         ],
       },
       {
@@ -388,8 +445,16 @@ export const PROJECTS: Project[] = [
         expandedText:
           "Rebooted the logo and brought that into product messaging and moments of delight",
         expandedImages: [
-          { src: "/images/socratic/logo1.jpg", caption: "— caption —" },
-          { src: "/images/socratic/logo2.mp4", caption: "— caption —" },
+          {
+            src: "/images/socratic/logo1.jpg",
+            caption:
+              "Full range of characters and strengthen brand association",
+          },
+          {
+            src: "/images/socratic/logo2.mp4",
+            caption:
+              "Designed short animations and motion guideline for how the logo would move",
+          },
         ],
       },
       {
@@ -398,19 +463,20 @@ export const PROJECTS: Project[] = [
           "I collaborated with the pedagogy team and led the creation of over 900 original content cards",
         hoverImage: "/images/socratic/socratic-content.jpg",
         expandedText:
-          "Led another visual designer and worked directly worked with pedagogy experts on first party content creation. In the span of 4 months, we created over 900 explainer cards across subjects like math, science, physics, biology, and history. 30-40% of usage surfaced a explainer card. \n Considerations: Tight loop of create, review, and QA testing,Readability and understandability, Mobile first; optimize for vertical space",
+          "Led another visual designer and worked directly worked with pedagogy experts on first party content creation. In the span of 4 months, we created over 900 explainer cards across subjects like math, science, physics, biology, and history. 30-40% of usage surfaced a explainer card.",
         expandedImages: [
           {
             src: "/images/socratic/socratic-content1.jpg",
-            caption: "— caption —",
+            caption: "Tight loop of create, review, and QA testing",
           },
           {
             src: "/images/socratic/socratic-content2.jpg",
-            caption: "— caption —",
+            caption:
+              "Designed for readability and understandability on vertical mobile space",
           },
           {
             src: "/images/socratic/socratic-content3.mp4",
-            caption: "— caption —",
+            caption: "Snippet of final product",
           },
         ],
       },
@@ -419,19 +485,21 @@ export const PROJECTS: Project[] = [
         description: "Cross-team collaborated on Google’s first math keyboard",
         hoverImage: "/images/socratic/socratic-keyboard.jpg",
         expandedText:
-          "Created a custom math keyboard that allowed users to manually edit mathematic symbols and address OCR errors \n Socratic & Lens are both Google products that use cameras as a main source of input. Sometimes, the OCR technology would fail. This causes users to get stuck in their end-to-end journey or experience bad query results. \n Led design work creating a custom math keyboard and collaborated cross-functionally for alignments between the two teams,Utilized insights from the UXR team to guide particular design interactions, Closely collaborated with engineering colleagues to implements and troubleshoot functionality",
+          "Socratic & Lens are both Google products that use cameras as a main source of input. Sometimes, the OCR technology would fail. This causes users to get stuck in their end-to-end journey or experience bad query results. \n Led design work creating a custom math keyboard so that users can manually address OCR errors. Collaborated cross-functionally for alignments between the two teams.",
         expandedImages: [
           {
             src: "/images/socratic/socratic-keyboard1.mp4",
-            caption: "— caption —",
+            caption:
+              "Adoption into Google Seach (eg. search math solver) in 2025",
           },
           {
             src: "/images/socratic/socratic-keyboard2.mp4",
-            caption: "— caption —",
+            caption:
+              "Closely collaborated with engineering to implements and troubleshoot functionality (eg. LaTex font) and UXR team to guide design interactions (eg. cursor UX)",
           },
           {
             src: "/images/socratic/socratic-keyboard3.jpg",
-            caption: "— caption —",
+            caption: "Snippet of final feature released on Lens in 2020",
           },
         ],
       },

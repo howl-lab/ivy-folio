@@ -1,7 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PROJECTS, SIDEBAR_ITEMS, type Contribution } from "../data/projects";
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isMobile;
+}
 
 const PT_SANS = '"PT Sans", sans-serif';
 const COURIER = '"Courier New", Courier, monospace';
@@ -11,10 +23,12 @@ function ContributionItem({
   item,
   expanded,
   onToggle,
+  isMobile,
 }: {
   item: Contribution;
   expanded: boolean;
   onToggle: () => void;
+  isMobile: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
 
@@ -31,7 +45,7 @@ function ContributionItem({
           style={{
             fontFamily: PT_SANS,
             fontWeight: 600,
-            fontSize: 15,
+            fontSize: 16,
             color: !expanded && hovered && item.hoverImage ? "#0015FF" : "#111",
             transition: "color 0.15s",
           }}
@@ -42,7 +56,7 @@ function ContributionItem({
       <p
         style={{
           fontFamily: PT_SANS,
-          fontSize: 14,
+          fontSize: 15,
           color: "#444",
           lineHeight: 1.5,
           marginBottom: expanded ? 16 : 0,
@@ -57,9 +71,9 @@ function ContributionItem({
           <p
             style={{
               fontFamily: PT_SANS,
-              fontSize: 14,
+              fontSize: 15,
               color: "#555",
-              lineHeight: 1.7,
+              lineHeight: 1.5,
               marginBottom: 16,
               maxWidth: 520,
               whiteSpace: "pre-line",
@@ -70,8 +84,9 @@ function ContributionItem({
           <div
             style={{
               display: "flex",
+              flexDirection: isMobile ? "column" : "row",
               gap: 16,
-              overflowX: "auto",
+              overflowX: isMobile ? "visible" : "auto",
               width: "100%",
               maxWidth: "100vw",
             }}
@@ -80,10 +95,10 @@ function ContributionItem({
               const img = item.expandedImages?.[i];
               if (!img) return null;
               return (
-                <div key={i}>
+                <div key={i} style={isMobile ? { width: "100%" } : undefined}>
                   <div
                     style={{
-                      width: 600,
+                      width: isMobile ? "100%" : 600,
                       aspectRatio: "4/3",
                       background: "#d8d8d8",
                       marginBottom: 6,
@@ -140,8 +155,8 @@ function ContributionItem({
         </div>
       )}
 
-      {/* hover image popup */}
-      {!expanded && hovered && item.hoverImage && (
+      {/* hover image popup — desktop only */}
+      {!isMobile && !expanded && hovered && item.hoverImage && (
         <div
           style={{
             position: "fixed",
@@ -200,9 +215,21 @@ function ContributionItem({
 
 // ─── Main component ────────────────────────────────────────────────────────────
 export default function ProjectTabs() {
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("Presence AI");
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [openSidebar, setOpenSidebar] = useState<Set<string>>(new Set());
+
+  const project = PROJECTS.find((p) => p.label === activeTab) ?? PROJECTS[0];
+
+  // On mobile, start with all items expanded; toggle still works
+  useEffect(() => {
+    if (isMobile) {
+      setExpandedItems(new Set(project.contributions.map((_, i) => i)));
+    } else {
+      setExpandedItems(new Set());
+    }
+  }, [isMobile, activeTab, project.contributions]);
 
   const toggleItem = (i: number) =>
     setExpandedItems((prev) => {
@@ -210,8 +237,6 @@ export default function ProjectTabs() {
       next.has(i) ? next.delete(i) : next.add(i);
       return next;
     });
-
-  const project = PROJECTS.find((p) => p.label === activeTab) ?? PROJECTS[0];
 
   const toggleSidebar = (key: string) => {
     setOpenSidebar((prev) => {
@@ -278,12 +303,12 @@ export default function ProjectTabs() {
           padding: "0 clamp(24px, 8vw, 120px)",
         }}
       >
-        {/* Left sidebar — fixed, no scroll */}
+        {/* Left sidebar — hidden on mobile */}
         <div
           style={{
             width: 160,
             flexShrink: 0,
-            display: "flex",
+            display: isMobile ? "none" : "flex",
             flexDirection: "column",
             paddingBottom: 40,
             paddingTop: 8,
@@ -382,19 +407,45 @@ export default function ProjectTabs() {
         </div>
 
         {/* Right content — scrollable */}
-        <div style={{ flex: 1, minWidth: 0, overflowY: "auto", paddingBottom: 80, paddingTop: 8 }}>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            overflowY: "auto",
+            paddingBottom: 120,
+            paddingTop: 8,
+          }}
+        >
           {/* project summary */}
           <p
             style={{
               fontFamily: PT_SANS,
-              fontSize: 15,
+              fontSize: 16,
               color: "#111",
               marginBottom: 28,
               lineHeight: 1.6,
               whiteSpace: "pre-line",
             }}
           >
-            {project.summary}
+            {project.summary.map((seg, i) =>
+              typeof seg === "string" ? (
+                seg
+              ) : (
+                <a
+                  key={i}
+                  href={seg.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: "#0015FF",
+                    textDecoration: "underline",
+                    textUnderlineOffset: 3,
+                  }}
+                >
+                  {seg.text}
+                </a>
+              ),
+            )}
           </p>
 
           {/* My contribution heading */}
@@ -418,6 +469,7 @@ export default function ProjectTabs() {
               item={item}
               expanded={expandedItems.has(i)}
               onToggle={() => toggleItem(i)}
+              isMobile={isMobile}
             />
           ))}
         </div>

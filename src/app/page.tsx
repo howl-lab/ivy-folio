@@ -26,24 +26,24 @@ function PineTree({ size = 30 }: { size?: number }) {
 
 // ─── Tree layout — scattered across full 100vh ─────────────────────────────────
 const TREES = [
-  { left: "2%",   top: "8%" },
-  { left: "10%",  top: "14%" },
-  { left: "18%",  top: "6%" },
-  { left: "5%",   top: "40%" },
-  { left: "14%",  top: "55%" },
-  { left: "3%",   top: "72%" },
-  { left: "22%",  top: "78%" },
-  { left: "38%",  top: "82%" },
-  { left: "50%",  top: "10%" },
-  { left: "62%",  top: "5%" },
-  { left: "72%",  top: "18%" },
-  { left: "80%",  top: "8%" },
-  { right: "4%",  top: "12%" },
+  { left: "2%", top: "8%" },
+  { left: "10%", top: "14%" },
+  { left: "18%", top: "6%" },
+  { left: "5%", top: "40%" },
+  { left: "14%", top: "55%" },
+  { left: "3%", top: "72%" },
+  { left: "22%", top: "78%" },
+  { left: "38%", top: "82%" },
+  { left: "50%", top: "10%" },
+  { left: "62%", top: "5%" },
+  { left: "72%", top: "18%" },
+  { left: "80%", top: "8%" },
+  { right: "4%", top: "12%" },
   { right: "12%", top: "6%" },
   { right: "20%", top: "22%" },
-  { right: "6%",  top: "44%" },
+  { right: "6%", top: "44%" },
   { right: "16%", top: "60%" },
-  { right: "3%",  top: "70%" },
+  { right: "3%", top: "70%" },
   { right: "24%", top: "76%" },
 ];
 
@@ -60,7 +60,7 @@ export default function HomePage() {
     if (!el || !root) return;
     const observer = new IntersectionObserver(
       ([entry]) => setDinoMode(entry.isIntersecting ? "follow" : "wander"),
-      { root, threshold: 0.2 }
+      { root, threshold: 0.2 },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -77,101 +77,110 @@ export default function HomePage() {
           scrollBehavior: "smooth",
         }}
       >
-      {/* ── Section 1: Landing ── */}
-      <section
-        style={{
-          position: "relative",
-          height: "100vh",
-          overflow: "hidden",
-          background: "#ebebeb",
-          scrollSnapAlign: "start",
-          scrollSnapStop: "always",
-        }}
-      >
-        {/* Scattered trees */}
-        {TREES.map((pos, i) => (
-          <span
-            key={i}
-            style={{ position: "absolute", ...pos, lineHeight: 0 }}
-          >
-            <PineTree size={28} />
-          </span>
-        ))}
-
-        {/* Centered text */}
-        <div
+        {/* ── Section 1: Landing ── */}
+        <section
           style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            textAlign: "center",
-            zIndex: 2,
+            position: "relative",
+            height: "100vh",
+            overflow: "hidden",
+            background: "#ebebeb",
+            scrollSnapAlign: "start",
+            scrollSnapStop: "always",
           }}
         >
-          <p
-            style={{
-              fontFamily: PT_SANS,
-              fontWeight: 600,
-              fontSize: "clamp(15px, 1.3vw, 18px)",
-              color: "#111",
-              marginBottom: 10,
-            }}
-          >
-            hi, im ivy
-          </p>
-          <p
-            style={{
-              fontFamily: PT_SANS,
-              fontSize: "clamp(14px, 1.2vw, 16px)",
-              color: "#111",
-              minHeight: "1.6em",
-            }}
-          >
-            <TextCycler />
-          </p>
-        </div>
+          {/* Scattered trees */}
+          {TREES.map((pos, i) => (
+            <span
+              key={i}
+              style={{ position: "absolute", ...pos, lineHeight: 0 }}
+            >
+              <PineTree size={28} />
+            </span>
+          ))}
 
-        {/* Scroll down cue */}
-        <div
+          {/* Centered text */}
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              textAlign: "center",
+              zIndex: 2,
+            }}
+          >
+            <p
+              style={{
+                fontFamily: PT_SANS,
+                fontWeight: 600,
+                fontSize: "clamp(15px, 1.3vw, 18px)",
+                color: "#111",
+                marginBottom: 10,
+              }}
+            >
+              hi, im ivy
+            </p>
+            <p
+              style={{
+                fontFamily: PT_SANS,
+                fontSize: "clamp(14px, 1.2vw, 16px)",
+                color: "#111",
+                minHeight: "1.6em",
+              }}
+            >
+              <TextCycler />
+            </p>
+          </div>
+
+          {/* Scroll down cue */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: 32,
+              left: "50%",
+              transform: "translateX(-50%)",
+              textAlign: "center",
+              zIndex: 2,
+              userSelect: "none",
+            }}
+          >
+            <p
+              style={{
+                fontFamily: PT_SANS,
+                fontSize: 13,
+                color: "#0015FF",
+                marginBottom: 6,
+                letterSpacing: "0.04em",
+              }}
+            >
+              scroll down
+            </p>
+            <span
+              style={{
+                display: "inline-block",
+                color: "#0015FF",
+                fontSize: 16,
+                animation: "bounce 1.2s ease-in-out infinite",
+              }}
+            >
+              ↓
+            </span>
+          </div>
+        </section>
+
+        {/* ── Section 2: Projects ── */}
+        <section
+          ref={section2Ref}
           style={{
-            position: "absolute",
-            bottom: 32,
-            left: "50%",
-            transform: "translateX(-50%)",
-            textAlign: "center",
-            zIndex: 2,
-            userSelect: "none",
+            background: "#ebebeb",
+            height: "100vh",
+            overflow: "hidden",
+            scrollSnapAlign: "start",
+            scrollSnapStop: "always",
           }}
         >
-          <p
-            style={{
-              fontFamily: PT_SANS,
-              fontSize: 13,
-              color: "#0015FF",
-              marginBottom: 6,
-              letterSpacing: "0.04em",
-            }}
-          >
-            scroll down
-          </p>
-          <span
-            style={{
-              display: "inline-block",
-              color: "#0015FF",
-              fontSize: 16,
-              animation: "bounce 1.2s ease-in-out infinite",
-            }}
-          >
-            ↓
-          </span>
-        </div>
-      </section>
-
-      {/* ── Section 2: Projects ── */}
-      <section ref={section2Ref} style={{ background: "#ebebeb", height: "100vh", overflow: "hidden", scrollSnapAlign: "start", scrollSnapStop: "always" }}>
-        <ProjectTabs />
-      </section>
+          <ProjectTabs />
+        </section>
       </div>
 
       {/* ── Dinos ── */}
