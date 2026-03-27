@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 const LINES = [
-  "building experiences & storytelling with play",
+  "experiments + play",
   "Generalist. 8+ yr experiences",
   "0-1 tools + big ideas + interfaces",
 ];

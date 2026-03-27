@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import TextCycler from "./components/TextCycler";
 import DinoWanderer from "./components/DinoWanderer";
 import DinoFollower from "./components/DinoFollower";
-import ProjectTabs from "./components/ProjectTabs";
+import ProjectApps from "./components/ProjectApps";
 
 const PT_SANS = '"PT Sans", sans-serif';
 const COURIER = '"Courier New", Courier, monospace';
@@ -239,7 +238,7 @@ export default function HomePage() {
                 marginBottom: 10,
               }}
             >
-              hi, im ivy
+              ivy's playground
             </p>
             <p
               style={{
@@ -249,7 +248,7 @@ export default function HomePage() {
                 minHeight: "1.6em",
               }}
             >
-              <TextCycler />
+              experiments + play
             </p>
           </div>
 
@@ -334,7 +333,7 @@ export default function HomePage() {
             scrollSnapStop: "always",
           }}
         >
-          <ProjectTabs />
+          <ProjectApps />
         </section>
       </div>
 
