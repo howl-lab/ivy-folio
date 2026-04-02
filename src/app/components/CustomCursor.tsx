@@ -27,7 +27,7 @@ export default function CustomCursor() {
         width: 24,
         height: 24,
         borderRadius: "50%",
-        background: "#0015FF",
+        background: "#0BDA51",
         pointerEvents: "none",
         zIndex: 9999,
         willChange: "transform",
