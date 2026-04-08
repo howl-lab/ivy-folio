@@ -4,62 +4,13 @@ import { useState, useRef, useEffect, useCallback } from "react";
 
 const PT_SANS = '"PT Sans", sans-serif';
 
-// ── About modal ───────────────────────────────────────────────────────────────
-function AboutModal({ onClose }: { onClose: () => void }) {
-  return (
-    <div
-      onClick={onClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 9980,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: "#fff",
-          width: "min(480px, 90vw)",
-          maxHeight: "70vh",
-          overflowY: "auto",
-          padding: "32px 36px",
-          fontFamily: PT_SANS,
-        }}
-      >
-        <p
-          style={{
-            fontSize: 15,
-            color: "#111",
-            lineHeight: 1.7,
-            marginBottom: 24,
-          }}
-        >
-          Hi I&apos;m ivy. This is the space where I play around with technology
-          and design.
-        </p>
-        <p
-          style={{
-            fontSize: 15,
-            color: "#111",
-            lineHeight: 1.7,
-            marginBottom: 48,
-          }}
-        >
-          These are my artifacts.
-        </p>
-        <p style={{ fontSize: 15, color: "#111", marginBottom: 48 }}>
-          ivychang02@gmail.com
-        </p>
-        <p style={{ fontSize: 15, color: "#111" }}>Copyrighted ©2026</p>
-      </div>
-    </div>
-  );
-}
-
-const PLACEHOLDERS = [
+const PLACEHOLDERS: {
+  title: string;
+  url?: string;
+  about?: boolean;
+  image: string;
+  tags: string[];
+}[] = [
   {
     title: "minesweeper",
     url: "https://v0-simple-minesweeper-game.vercel.app/",
@@ -72,11 +23,9 @@ const PLACEHOLDERS = [
     image: "images/phaseFM.jpg",
     tags: ["tool"],
   },
-  { title: "Project title", url: "", image: "", tags: ["game"] },
-  { title: "Project title", url: "", image: "", tags: ["tool"] },
-  // { title: "Project title", url: "", image: "", tags: [] },
-  // { title: "Project title", url: "", image: "", tags: [] },
-  // { title: "Project title", url: "", image: "", tags: [] },
+  { title: "README", about: true, image: "images/readme.jpg", tags: ["tool"] },
+  // { title: "Project title", url: "", image: "", tags: ["game"] },
+  // { title: "Project title", url: "", image: "", tags: ["tool"] },
   // { title: "Project title", url: "", image: "", tags: [] },
 ];
 
@@ -360,8 +309,7 @@ export default function ProjectApps() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [canvasHovered, setCanvasHovered] = useState(false);
-  const [aboutOpen, setAboutOpen] = useState(false);
-  const [aboutHovered, setAboutHovered] = useState(false);
+  const [activeAbout, setActiveAbout] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -374,7 +322,7 @@ export default function ProjectApps() {
   }, []);
 
   const filtered = PLACEHOLDERS.filter(
-    (p) => !activeTag || p.tags.includes(activeTag),
+    (p) => !activeTag || p.tags.length === 0 || p.tags.includes(activeTag),
   );
 
   // ── Shared pieces ──────────────────────────────────────────────────────────
@@ -383,11 +331,12 @@ export default function ProjectApps() {
     <button
       onClick={() => {
         setActiveUrl(null);
+        setActiveAbout(false);
         setMenuOpen(false);
       }}
       style={{
         fontFamily: PT_SANS,
-        fontSize: 26,
+        fontSize: 24,
         fontWeight: 700,
         color: "#111",
         background: "none",
@@ -400,43 +349,6 @@ export default function ProjectApps() {
     >
       Playground
     </button>
-  );
-
-  const aboutButton = (
-    <div style={{ position: "relative", display: "inline-block" }}>
-      <button
-        onClick={() => setAboutOpen((o) => !o)}
-        onMouseEnter={() => setAboutHovered(true)}
-        onMouseLeave={() => setAboutHovered(false)}
-        style={{
-          width: 12,
-          height: 12,
-          background: "#111",
-          border: "none",
-          cursor: "pointer",
-          padding: 0,
-          flexShrink: 0,
-          display: "block",
-        }}
-      />
-      {aboutHovered && (
-        <span
-          style={{
-            position: "absolute",
-            left: 18,
-            top: "50%",
-            transform: "translateY(-50%)",
-            fontFamily: PT_SANS,
-            fontSize: 12,
-            color: "#111",
-            whiteSpace: "nowrap",
-            pointerEvents: "none",
-          }}
-        >
-          about
-        </span>
-      )}
-    </div>
   );
 
   const filterBar = (
@@ -496,8 +408,15 @@ export default function ProjectApps() {
         <div key={i}>
           <div
             onClick={() => {
-              p.url && setActiveUrl(p.url);
-              setMenuOpen(false);
+              if (p.about) {
+                setActiveAbout(true);
+                setActiveUrl(null);
+                setMenuOpen(false);
+              } else if (p.url) {
+                setActiveUrl(p.url);
+                setActiveAbout(false);
+                setMenuOpen(false);
+              }
             }}
             onMouseEnter={() => setHoveredIndex(i)}
             onMouseLeave={() => setHoveredIndex(null)}
@@ -505,7 +424,7 @@ export default function ProjectApps() {
               aspectRatio: "1 / 1",
               background: "#d0d0d0",
               marginBottom: 4,
-              cursor: p.url ? "pointer" : "default",
+              cursor: p.url || p.about ? "pointer" : "default",
               overflow: "hidden",
               transform:
                 hoveredIndex === i ? "translateY(-2px)" : "translateY(0)",
@@ -561,63 +480,118 @@ export default function ProjectApps() {
   );
 
   const canvas = (
-    <div
-      ref={canvasRef}
-      onMouseEnter={() => setCanvasHovered(true)}
-      onMouseLeave={() => setCanvasHovered(false)}
-      style={{
-        flex: 1,
-        position: "relative",
-        overflow: "hidden",
-        background: "#ebebeb",
-      }}
-    >
-      {activeUrl ? (
-        <>
-          <button
-            onClick={() => setActiveUrl(null)}
-            style={{
-              position: "absolute",
-              top: 12,
-              right: 16,
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontFamily: PT_SANS,
-              fontSize: 13,
-              color: "#0BDA51",
-              zIndex: 1,
-            }}
-          >
-            close
-          </button>
-          <iframe
-            src={activeUrl}
-            style={{ width: "100%", height: "100%", border: "none" }}
-            allow="fullscreen"
-          />
-        </>
-      ) : (
-        <>
-          {/* Scattered trees */}
-          {TREES.map((pos, i) => (
-            <span
-              key={i}
+    <div style={{ flex: 1, padding: 24, boxSizing: "border-box" }}>
+      <div
+        ref={canvasRef}
+        onMouseEnter={() => setCanvasHovered(true)}
+        onMouseLeave={() => setCanvasHovered(false)}
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "relative",
+          overflow: "hidden",
+          background: "#fff",
+          border: "1px solid #d0d0d0",
+          borderRadius: 6,
+        }}
+      >
+        {activeUrl ? (
+          <>
+            <button
+              onClick={() => setActiveUrl(null)}
               style={{
                 position: "absolute",
-                ...pos,
-                lineHeight: 0,
+                top: 12,
+                right: 16,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: PT_SANS,
+                fontSize: 13,
+                color: "#0BDA51",
                 zIndex: 1,
               }}
             >
-              <PineTree size={28} />
-            </span>
-          ))}
-
-          {/* Wandering dino */}
-          <CanvasWanderer active={canvasHovered} containerRef={canvasRef} />
-        </>
-      )}
+              close
+            </button>
+            <iframe
+              src={activeUrl}
+              style={{ width: "100%", height: "100%", border: "none" }}
+              allow="fullscreen"
+            />
+          </>
+        ) : activeAbout ? (
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              padding: "clamp(32px, 6vw, 80px)",
+              fontFamily: PT_SANS,
+            }}
+          >
+            <p
+              style={{
+                fontSize: 15,
+                color: "#111",
+                lineHeight: 1.7,
+                marginBottom: 24,
+                maxWidth: 400,
+              }}
+            >
+              Hi I&apos;m ivy. This is the space where I play around with
+              technology and ideas.
+            </p>
+            <p
+              style={{
+                fontSize: 15,
+                color: "#111",
+                lineHeight: 1.7,
+                marginBottom: 48,
+                maxWidth: 400,
+              }}
+            >
+              These are my artifacts.
+            </p>
+            <p
+              style={{
+                fontSize: 15,
+                color: "#111",
+                lineHeight: 1.7,
+                marginBottom: 48,
+                maxWidth: 400,
+              }}
+            >
+              Currently constructing an iOS app for science-forward birding for
+              kids 🦤🪶
+            </p>
+            <p style={{ fontSize: 15, color: "#111", marginBottom: 48 }}>
+              ivychang02@gmail.com
+            </p>
+            <p style={{ fontSize: 15, color: "#111", fontStyle: "italic" }}>
+              Copyrighted ©2026
+            </p>
+          </div>
+        ) : (
+          <>
+            {TREES.map((pos, i) => (
+              <span
+                key={i}
+                style={{
+                  position: "absolute",
+                  ...pos,
+                  lineHeight: 0,
+                  zIndex: 1,
+                }}
+              >
+                <PineTree size={28} />
+              </span>
+            ))}
+            <CanvasWanderer active={canvasHovered} containerRef={canvasRef} />
+          </>
+        )}
+      </div>
     </div>
   );
 
@@ -676,7 +650,6 @@ export default function ProjectApps() {
                 boxSizing: "border-box",
               }}
             >
-              {aboutButton}
               {filterBar}
               {projectGrid}
             </div>
@@ -696,19 +669,15 @@ export default function ProjectApps() {
               padding: "clamp(20px, 4vw, 48px)",
               gap: 20,
               overflowY: "auto",
-              borderRight: "1px solid #d0d0d0",
             }}
           >
             {titleButton}
-            {aboutButton}
             {filterBar}
             {projectGrid}
           </div>
           {canvas}
         </>
       )}
-
-      {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
     </div>
   );
 }
