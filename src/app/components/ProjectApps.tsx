@@ -114,8 +114,6 @@ function DinoSprite({
 // ── Canvas-scoped wanderer ────────────────────────────────────────────────────
 const SPEED = 130;
 const EAT_DIST = 24;
-const IDLE_MIN = 800;
-const IDLE_MAX = 2000;
 
 interface Pixel {
   id: number;
@@ -130,7 +128,6 @@ function CanvasWanderer({
   active: boolean;
   containerRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  // null = not yet initialized, stays at last position on re-activation
   const posRef = useRef<{ x: number; y: number } | null>(null);
   const targetRef = useRef({ x: 0, y: 0 });
   const idleUntilRef = useRef(0);
@@ -140,11 +137,16 @@ function CanvasWanderer({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const pixelQueueRef = useRef<Pixel[]>([]);
   const nextIdRef = useRef(0);
+  // true until the entrance walk reaches the center
+  const enteringRef = useRef(true);
+
+  const eatTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [walking, setWalking] = useState(false);
   const [facingLeft, setFacingLeft] = useState(false);
   const [frame, setFrame] = useState(0);
   const [pixels, setPixels] = useState<Pixel[]>([]);
+  const [eating, setEating] = useState(false);
 
   const getBounds = useCallback(() => {
     const el = containerRef.current;
@@ -162,17 +164,18 @@ function CanvasWanderer({
 
   // Animation loop
   useEffect(() => {
-    if (!active) {
+    // Keep running during entrance even if canvas isn't hovered yet
+    if (!active && !enteringRef.current) {
       cancelAnimationFrame(rafRef.current!);
       setWalking(false);
       return;
     }
 
-    // Initialize position only on first mount, not on every re-activation
     if (!posRef.current) {
       const { w, h } = getBounds();
-      posRef.current = { x: w / 2, y: h / 2 };
-      targetRef.current = pickWaypoint();
+      // Start off the left edge, walk to center
+      posRef.current = { x: -60, y: h / 2 };
+      targetRef.current = { x: w / 2, y: h / 2 };
     }
 
     lastTRef.current = undefined;
@@ -191,11 +194,13 @@ function CanvasWanderer({
       const pos = posRef.current!;
       const now = performance.now();
 
-      // Prefer pixel target over waypoint
-      const tgt =
-        pixelQueueRef.current.length > 0
-          ? { x: pixelQueueRef.current[0].x, y: pixelQueueRef.current[0].y }
-          : targetRef.current;
+      // Target the closest pixel, or fall back to waypoint
+      const closestPixel = pixelQueueRef.current.reduce<Pixel | null>((best, p) => {
+        const d = Math.hypot(p.x - pos.x, p.y - pos.y);
+        if (!best) return p;
+        return d < Math.hypot(best.x - pos.x, best.y - pos.y) ? p : best;
+      }, null);
+      const tgt = closestPixel ?? targetRef.current;
 
       if (now < idleUntilRef.current) {
         setWalking(false);
@@ -205,15 +210,18 @@ function CanvasWanderer({
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < EAT_DIST) {
-          if (pixelQueueRef.current.length > 0) {
-            const eaten = pixelQueueRef.current[0];
-            pixelQueueRef.current = pixelQueueRef.current.slice(1);
+          if (closestPixel) {
+            const eaten = closestPixel;
+            pixelQueueRef.current = pixelQueueRef.current.filter((p) => p.id !== eaten.id);
             setPixels((prev) => prev.filter((p) => p.id !== eaten.id));
+            setEating(true);
+            clearTimeout(eatTimeoutRef.current);
+            eatTimeoutRef.current = setTimeout(() => setEating(false), 500);
           }
-          idleUntilRef.current =
-            performance.now() +
-            IDLE_MIN +
-            Math.random() * (IDLE_MAX - IDLE_MIN);
+          // Entrance complete — switch to normal wandering
+          enteringRef.current = false;
+          // Very short pause after eating
+          idleUntilRef.current = performance.now() + 250;
           targetRef.current = pickWaypoint();
           setWalking(false);
         } else {
@@ -270,6 +278,15 @@ function CanvasWanderer({
 
   return (
     <>
+      <style>{`
+        @keyframes dinoChomp {
+          0%   { transform: scale(1); }
+          25%  { transform: scaleX(1.3) scaleY(0.75); }
+          60%  { transform: scaleX(0.9) scaleY(1.1); }
+          100% { transform: scale(1); }
+        }
+      `}</style>
+
       {pixels.map((p) => (
         <div
           key={p.id}
@@ -286,6 +303,7 @@ function CanvasWanderer({
           }}
         />
       ))}
+
       <div
         ref={wrapperRef}
         style={{
@@ -295,9 +313,12 @@ function CanvasWanderer({
           pointerEvents: "none",
           willChange: "transform",
           zIndex: 2,
+          transform: "translate(-100px, -100px)",
         }}
       >
-        <DinoSprite walking={walking} facingLeft={facingLeft} frame={frame} />
+        <div style={{ animation: eating ? "dinoChomp 0.5s ease-in-out" : "none" }}>
+          <DinoSprite walking={walking} facingLeft={facingLeft} frame={frame} />
+        </div>
       </div>
     </>
   );
